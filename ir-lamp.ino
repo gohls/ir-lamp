@@ -1,12 +1,17 @@
+#include <LongUnion.h>
+#include <IRremote.h>
+#include <TinyIRReceiver.h>
+#include <digitalWriteFast.h>
+
 // IR Lamp 
 
 #include "IRremote.h"
 
-int receiver = 11; // Signal Pin of IR receiver to Arduino Digital Pin 11
+int IR_RECEIVE_PIN = 11; // Signal Pin of IR receiver to Arduino Digital Pin 11
 
 /*-----( Declare objects )-----*/
-IRrecv irrecv(receiver);     // create instance of 'irrecv'
-decode_results results;      // create instance of 'decode_results'
+//IRrecv irrecv(receiver);     // create instance of 'irrecv'
+//decode_results results;      // create instance of 'decode_results'
 
 /*-----( Function )-----*/
 void translateIR() // takes action based on IR code received
@@ -15,7 +20,7 @@ void translateIR() // takes action based on IR code received
 
 {
 
-  switch(results.value)
+  switch(IrReceiver.decodedIRData.decodedRawData)
 
   {
   case 0xFFA25D: Serial.println("POWER"); break;
@@ -43,7 +48,7 @@ void translateIR() // takes action based on IR code received
 
   default: 
     Serial.println(" other button : ");
-    Serial.println(results.value);
+    Serial.println(IrReceiver.decodedIRData.decodedRawData);
 
   }// End Case
 
@@ -55,17 +60,17 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
   Serial.begin(9600);
   Serial.println("IR Receiver Button Decode"); 
-  irrecv.enableIRIn(); // Start the receiver
+  IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK); // Start the receiver
 
 }/*--(end setup )---*/
 
 
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
-  if (irrecv.decode()) // have we received an IR signal?
+  if (IrReceiver.decode()) // have we received an IR signal?
 
   {
     translateIR(); 
-    irrecv.resume(); // receive the next value
+    IrReceiver.resume(); // receive the next value
   }  
 }/* --(end main loop )-- */
